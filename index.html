@@ -272,13 +272,13 @@ body.show-fixed-banner.has-ticker .toast{bottom:158px}
    বিচ্ছিন্ন করলেই কেবল এই ফোনে লোকাল মোডে চলবে।
    ================================================================ */
 
-var LS_KEY = "school-one-live-v1";
-var FB_CONFIG_KEY = "school-one-live-fbconfig";
-var FB_OFF_KEY = "school-one-live-fb-off";
-var SESSION_KEY = "school-one-live-session";
-var AUTH_ACTIVE_KEY = "school-fb-auth-active";
-var GUARDIAN_SESSION_KEY = "school-guardian-session";
-var GUARDIAN_CHILDREN_KEY = "school-guardian-children";
+var LS_KEY = "school-two-live-v1";
+var FB_CONFIG_KEY = "school-two-live-fbconfig";
+var FB_OFF_KEY = "school-two-live-fb-off";
+var SESSION_KEY = "school-two-live-session";
+var AUTH_ACTIVE_KEY = "school-two-fb-auth-active";
+var GUARDIAN_SESSION_KEY = "school-two-guardian-session";
+var GUARDIAN_CHILDREN_KEY = "school-two-guardian-children";
 /* Built-in default Firebase config (project: school-app) — the app
    connects in live mode on first open on every device, with no manual
    config entry needed. An admin can still override it from Settings,
@@ -455,8 +455,8 @@ function toast(msg){
    live sync also pops a phone notification. Ids of urgent notices
    already seen on this device are kept (same local storage the app
    already uses) so old notices never re-notify. */
-var NOTIFY_SEEN_KEY = "school-one-live-notify-seen";
-var NOTIFY_LATER_KEY = "school-one-live-notify-later";
+var NOTIFY_SEEN_KEY = "school-two-live-notify-seen";
+var NOTIFY_LATER_KEY = "school-two-live-notify-later";
 var knownUrgentIds = null;
 function notifySupported(){ return typeof window!=="undefined" && "Notification" in window; }
 function notifyLaterDismissed(){
@@ -509,7 +509,7 @@ function fireNoticeNotification(n){
     var notif = new Notification((D && D.settings && D.settings.nameBn) || SCHOOL_NAME, {
       body: "জরুরি নোটিশ: " + n.title,
       icon: SCHOOL_LOGO,
-      tag: "school-urgent-" + n.id
+      tag: "school-two-urgent-" + n.id
     });
     notif.onclick = function(){
       try{ window.focus(); }catch(e){}
@@ -564,7 +564,7 @@ function requestNotifyPermission(){
         var hello = new Notification((D && D.settings && D.settings.nameBn) || SCHOOL_NAME, {
           body: "নোটিফিকেশন চালু হয়েছে। জরুরি নোটিশ এলেই এভাবে জানানো হবে।",
           icon: SCHOOL_LOGO,
-          tag: "school-notify-on"
+          tag: "school-two-notify-on"
         });
         hello.onclick = function(){ try{ window.focus(); }catch(e){} try{ hello.close(); }catch(e){} };
       }catch(e){}
@@ -716,7 +716,7 @@ function initOneSignal(){
    notification above still work; token registration simply waits,
    the popup does not promise lock-screen delivery, and the message
    after granting reflects exactly what actually happened. */
-var FCM_TOKEN_KEY = "school-one-live-fcm-token";
+var FCM_TOKEN_KEY = "school-two-live-fcm-token";
 var fcmState = "idle"; // idle | registered | nokey | unsupported | error
 var fcmMessagingObj = null;
 var fcmForegroundBound = false;
@@ -741,7 +741,7 @@ function fcmSupported(){
 }
 function fcmApp(){
   if(!window.firebase || !firebase.apps) return null;
-  for(var i=0;i<firebase.apps.length;i++){ if(firebase.apps[i].name==="school-one-live") return firebase.apps[i]; }
+  for(var i=0;i<firebase.apps.length;i++){ if(firebase.apps[i].name==="school-two-live") return firebase.apps[i]; }
   return firebase.apps.length ? firebase.apps[0] : null;
 }
 function fcmMessaging(){
@@ -1275,7 +1275,7 @@ function connectFirebase(cfg, silent){
   try{
     restMode = false; stopRestPolling(); restLastJson = ""; clearTimeout(connectTimer);
     syncStatus = "connecting"; renderStatus();
-    var appName = "school-one-live";
+    var appName = "school-two-live";
     var app = null;
     for(var i=0;i<firebase.apps.length;i++){ if(firebase.apps[i].name===appName) app=firebase.apps[i]; }
     if(!app) app = firebase.initializeApp(cfg, appName);
@@ -2120,7 +2120,7 @@ function shareEntryLink(){
    download link once. Whenever a new APK is uploaded, change
    versionCode/versionName here and the notice appears for everyone
    automatically on the next web deploy. */
-var APK_UPDATE_SEEN_KEY = "school-apk-update-seen";
+var APK_UPDATE_SEEN_KEY = "school-two-apk-update-seen";
 var LATEST_APK = {versionCode: 1, versionName: "1.0.0", url: DEFAULT_APK_LINK}; // COPY-2: fresh APK line for the second school — bump this when its first APK is built (the original school's APK is v1.0.16 / code 17; do NOT copy that number here).
 function apkUpdateUnseen(){
   try{ return localStorage.getItem(APK_UPDATE_SEEN_KEY) !== LATEST_APK.versionName; }catch(e){ return true; }
@@ -2787,8 +2787,8 @@ function markGuardianChatRead(ph){
    Items WITHOUT a createdAt never count (old/legacy data can never
    badge forever). ADMIN-ONLY: guardians must never see a complaint
    count — they do not load the private complaints node anyway. */
-var OPINIONS_SEEN_KEY = "school-opinions-seen";
-var COMPLAINTS_SEEN_KEY = "school-complaints-seen";
+var OPINIONS_SEEN_KEY = "school-two-opinions-seen";
+var COMPLAINTS_SEEN_KEY = "school-two-complaints-seen";
 function newestCreatedAt(items){
   var newest = "";
   (items||[]).forEach(function(x){ var c = x && x.createdAt ? String(x.createdAt) : ""; if(c && (!newest || c > newest)) newest = c; });
@@ -6030,17 +6030,17 @@ function setTeacherSession(t, phone){
   teacherPhone = normPhone(phone || (t && t.phone) || "");
   teacherSession = { phone:teacherPhone, teacherId:(t && t.id) || "", name:(t && t.name) || "শিক্ষক", classes:(t && t.classes) || (t && t.classTaken ? [t.classTaken] : []), subjects:(t && t.subjects) || (t && t.subject ? [t.subject] : []) };
   ui.teacherId = teacherSession.teacherId; ui.teacherName = teacherSession.name; ui.teacherPhone = teacherPhone;
-  try{ localStorage.setItem("school-teacher-session", JSON.stringify(teacherSession)); }catch(e){}
+  try{ localStorage.setItem("school-two-teacher-session", JSON.stringify(teacherSession)); }catch(e){}
 }
 function clearTeacherSession(){
   teacherPhone = ""; teacherSession = null;
   ui.teacherId = null; ui.teacherName = ""; ui.teacherPhone = "";
-  try{ localStorage.removeItem("school-teacher-session"); }catch(e){}
+  try{ localStorage.removeItem("school-two-teacher-session"); }catch(e){}
 }
 function restoreTeacherSession(){
   if(teacherPhone || ui.teacherId) return;
   var raw = "";
-  try{ raw = localStorage.getItem("school-teacher-session") || ""; }catch(e){}
+  try{ raw = localStorage.getItem("school-two-teacher-session") || ""; }catch(e){}
   if(!raw) return;
   if(raw.charAt(0)==="{"){ try{ teacherSession = JSON.parse(raw); teacherPhone = normPhone(teacherSession.phone||""); }catch(e){ teacherPhone = normPhone(raw); } }
   else teacherPhone = normPhone(raw);
@@ -6830,7 +6830,7 @@ function captureCameraPhoto(){
    name + class + institution + score (+ phone, age, roll, date).
    Quizzes themselves (title, class, questions + correct answers)
    live in the public node. No timers, no negative marking. */
-var QUIZ_PLAYER_KEY = "school-quiz-player";
+var QUIZ_PLAYER_KEY = "school-two-quiz-player";
 /* Classes for the quiz registration form. Students come from many
    institutions in the area, so "অন্যান্য" lets a student type their
    own class name. */
@@ -10149,7 +10149,7 @@ loadKnownUrgent();
 // An earlier build briefly kept an FCM service-account copy in this
 // phone's local storage — that credential must never live in a
 // browser, so wipe any leftover on sight.
-try{ localStorage.removeItem("school-one-live-fcm-serviceaccount"); }catch(e){}
+try{ localStorage.removeItem("school-two-live-fcm-serviceaccount"); }catch(e){}
 if(!ui.attClass && D.classes.length) ui.attClass = D.classes[0];
 ui.forceEntry = readEntryParam();
 render();
